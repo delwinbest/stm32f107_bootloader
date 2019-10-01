@@ -25,6 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "boot_conf.h"
+
 
 /* USER CODE END Includes */
 
@@ -35,7 +37,28 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#if defined(STM32F107xC)
 
+SPI_HandleTypeDef hspi1;	// SD-card
+TIM_HandleTypeDef htim2;	// Buzzer
+char SPISD_Path[4];     /* USER logical drive path */
+
+static void MX_SPI1_Init(void);
+static void MX_TIM2_Init(void);
+static void ShortBeep();
+
+#elif defined(STM32F103xE)
+# include "bsp_driver_sd.h"
+
+SD_HandleTypeDef hsd;
+HAL_SD_CardInfoTypedef SDCardInfo;
+char SD_Path[4];        /* SD logical drive path */
+
+static void MX_SDIO_SD_Init(void);
+static inline void ShortBeep() {}
+#endif
+
+FATFS sdFileSystem;		// 0:/
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -61,12 +84,16 @@ static void MX_TIM2_Init(void);
 void StartDefaultTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
-
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+inline void moveVectorTable(uint32_t Offset)
+{
+    // __disable_irq();
+    SCB->VTOR = FLASH_BASE | Offset;
+}
 /* USER CODE END 0 */
 
 /**
@@ -101,7 +128,35 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  MX_FATFS_Init();
+  ShortBeep();
 
+  if (FR_OK == f_mount(&sdFileSystem, SPISD_Path, 1) && FR_OK == flash("0:/firmware.bin"))
+  {
+      f_mount(NULL, SPISD_Path, 1);
+      ShortBeep();
+
+      HAL_SPI_MspDeInit(&hspi1);
+      HAL_TIM_Base_MspDeInit(&htim2);
+
+      __HAL_RCC_GPIOA_CLK_DISABLE();
+      __HAL_RCC_GPIOB_CLK_DISABLE();
+      __HAL_RCC_GPIOC_CLK_DISABLE();
+      __HAL_RCC_GPIOD_CLK_DISABLE();
+      __HAL_RCC_GPIOE_CLK_DISABLE();
+
+      HAL_DeInit();
+
+      // Disabling SysTick interrupt
+      SysTick->CTRL = 0;
+      moveVectorTable(MAIN_PR_OFFSET);
+      // Setting initial value to stack pointer
+      __set_MSP(*mcuFirstPageAddr);
+      // booting really
+
+      Callable resetHandler = (Callable) (*(mcuFirstPageAddr + 1) );
+      resetHandler();
+  }
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -122,15 +177,15 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  //osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  //defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
-  osKernelStart();
+  //osKernelStart();
   
   /* We should never get here as control is now taken by the scheduler */
 
@@ -139,7 +194,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	ShortBeep();
+	HAL_Delay(5000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -280,7 +336,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void ShortBeep()
+{
+	HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_3);
+	HAL_Delay(20);
+	HAL_TIM_OC_Stop_IT(&htim2, TIM_CHANNEL_3);
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */

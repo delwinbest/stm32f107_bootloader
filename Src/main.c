@@ -95,10 +95,11 @@ inline void moveVectorTable(uint32_t Offset)
     SCB->VTOR = FLASH_BASE | Offset;
 }
 
-void uart_send(char buffer[]){
-	HAL_UART_Transmit_IT(&huart1, (uint8_t *)buffer, sizeof(buffer));
+void debugPrintln(char _out[]){
+ HAL_UART_Transmit(&huart1, (uint8_t *) _out, strlen(_out), 10);
+ char newline[2] = "\r\n";
+ HAL_UART_Transmit(&huart1, (uint8_t *) newline, 2, 10);
 }
-
 
 /* PRINTF REDIRECT to UART END */
 /* USER CODE END 0 */
@@ -140,7 +141,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  uart_send("Booting\n\r");
+  debugPrintln("Booting");
   MX_FATFS_Init();
   ShortBeep();
 
@@ -185,7 +186,7 @@ int main(void)
   {
     ShortBeep();
     HAL_Delay(5000);
-    uart_send(".");
+    debugPrintln(".");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -241,6 +242,9 @@ void SystemClock_Config(void)
   */
 static void MX_NVIC_Init(void)
 {
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* SPI1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(SPI1_IRQn);

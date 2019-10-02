@@ -25,7 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "boot_conf.h"
-
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -70,6 +70,8 @@ SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim2;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -77,8 +79,10 @@ TIM_HandleTypeDef htim2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_USART1_UART_Init(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 /* USER CODE END PFP */
@@ -90,6 +94,13 @@ inline void moveVectorTable(uint32_t Offset)
     // __disable_irq();
     SCB->VTOR = FLASH_BASE | Offset;
 }
+
+void uart_send(char buffer[]){
+	HAL_UART_Transmit_IT(&huart1, (uint8_t *)buffer, sizeof(buffer));
+}
+
+
+/* PRINTF REDIRECT to UART END */
 /* USER CODE END 0 */
 
 /**
@@ -121,10 +132,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
   MX_TIM2_Init();
   MX_FATFS_Init();
+  MX_SPI1_Init();
+  MX_USART1_UART_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  uart_send("Booting\n\r");
   MX_FATFS_Init();
   ShortBeep();
 
@@ -132,7 +148,14 @@ int main(void)
   {
       f_mount(NULL, SPISD_Path, 1);
       ShortBeep();
-
+      HAL_Delay(100);
+      ShortBeep();
+      HAL_Delay(100);
+      ShortBeep();
+      HAL_Delay(100);
+      ShortBeep();
+      HAL_Delay(100);
+      ShortBeep();
       HAL_SPI_MspDeInit(&hspi1);
       HAL_TIM_Base_MspDeInit(&htim2);
 
@@ -162,6 +185,7 @@ int main(void)
   {
     ShortBeep();
     HAL_Delay(5000);
+    uart_send(".");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -209,6 +233,17 @@ void SystemClock_Config(void)
   /** Configure the Systick interrupt time 
   */
   __HAL_RCC_PLLI2S_ENABLE();
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* SPI1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(SPI1_IRQn);
 }
 
 /**
@@ -299,6 +334,39 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -315,7 +383,7 @@ static void MX_GPIO_Init(void)
 void ShortBeep()
 {
 	HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_3);
-	HAL_Delay(20);
+	HAL_Delay(40);
 	HAL_TIM_OC_Stop_IT(&htim2, TIM_CHANNEL_3);
 }
 /* USER CODE END 4 */

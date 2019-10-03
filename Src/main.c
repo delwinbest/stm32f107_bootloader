@@ -46,8 +46,6 @@ SPI_HandleTypeDef hspi1;	// SD-card
 TIM_HandleTypeDef htim2;	// Buzzer
 
 
-//static void MX_SPI1_Init(void);
-//static void MX_TIM2_Init(void);
 static void ShortBeep();
 
 /* USER CODE END PD */
@@ -71,7 +69,7 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN PFP */
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-FRESULT Explore_Disk(char *path, uint8_t recu_level);
+//FRESULT Explore_Disk(char *path, uint8_t recu_level);
 
 /* USER CODE END PFP */
 
@@ -83,7 +81,7 @@ inline void moveVectorTable(uint32_t Offset)
     SCB->VTOR = FLASH_BASE | Offset;
 }
 
-extern USBH_HandleTypeDef hUsbHostFS;
+//extern USBH_HandleTypeDef hUsbHostFS;
 
 
 /* USER CODE END 0 */
@@ -95,7 +93,7 @@ extern USBH_HandleTypeDef hUsbHostFS;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  FRESULT res;
   /* USER CODE END 1 */
   
 
@@ -118,10 +116,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM2_Init();
-  MX_FATFS_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_USB_HOST_Init();
+  MX_FATFS_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -131,20 +129,23 @@ int main(void)
   ShortBeep();
 
   printf("Mounting Filesystem...\n\r");
-  unsigned char result;
-  result = f_mount(&USBHFatFS, (TCHAR const*)USBHPath, 0);
 
-  //while(!USBH_MSC_IsReady(&hUsbHostFS))
-  //{
-	//MX_USB_HOST_Process();
-  //}
-  //Explore_Disk("0:/", 1);
-  if (result == FR_OK)
+  res = f_mount(&USBHFatFS, (TCHAR const*)USBHPath, 0);
+  if (res == FR_OK)
   {
 	  printf("SUCCESS!\n\r");
   } else {
-	  printf("FATFS FAILED CODE : %d\n\r", (int)result);
+	  printf("Failed to open %s, error %d\n\r", (TCHAR const*)USBHPath, res);
   }
+  /*
+  while(!USBH_MSC_IsReady(&hUsbHostFS))
+	{
+		//printf("..");
+		MX_USB_HOST_Process();
+	}
+
+  //Explore_Disk("0:/", 1);
+
   /*
   if (FR_OK == f_mount(&sdFileSystem, SPISD_Path, 1) && FR_OK == flash("0:/firmware.bin"))
   {
@@ -274,7 +275,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+	printf("ERROR\n\r");
   /* USER CODE END Error_Handler_Debug */
 }
 

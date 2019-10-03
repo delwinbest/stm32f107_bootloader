@@ -44,10 +44,10 @@
 									<listOptionValue builtIn="false" value="../Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy" />
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
-								<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /></option>
+								<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /></option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
@@ -87,10 +87,10 @@
 									<listOptionValue builtIn="false" value="../Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy" />
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
-								<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /></option>
+								<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /></option>
 								<option id="com.atollic.truestudio.gpp.symbols.defined.1619552487" name="Defined symbols" superClass="com.atollic.truestudio.gpp.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
@@ -179,10 +179,10 @@
 									<listOptionValue builtIn="false" value="../Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy" />
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
-								<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /></option>
+								<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /></option>
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1670122205" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />
@@ -222,10 +222,10 @@
 									<listOptionValue builtIn="false" value="../Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc" />
 									<listOptionValue builtIn="false" value="../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy" />
-									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" />
+									
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F1xx/Include" />
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include" />
-								<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /></option>
+								<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Core/Inc" /><listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src" /><listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src/drivers" /></option>
 								<option id="com.atollic.truestudio.gpp.symbols.defined.1619552487" name="Defined symbols" superClass="com.atollic.truestudio.gpp.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))" />
 									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))" />

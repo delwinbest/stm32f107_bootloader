@@ -39,7 +39,6 @@
 
 #define MKS_TFT
 
-#if defined(STM32F107xC) && defined(MKS_TFT)
 /**
  * Makerbase MKS-TFT32
  */
@@ -50,11 +49,9 @@
  #define FLASH_nCS_Pin           GPIO_PIN_9
  #define FLASH_nCS_GPIO_Port     GPIOB
 
-extern FATFS sdFileSystem;		// 0:/
+//extern FATFS sdFileSystem;		// 0:/
 
-#elif defined(STM32F103xE) && defined(CZMINI)
 
-#endif
 
 typedef enum
 {

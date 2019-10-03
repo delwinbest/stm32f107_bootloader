@@ -24,6 +24,7 @@
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "usb_host.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -40,28 +41,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#if defined(STM32F107xC)
 
 SPI_HandleTypeDef hspi1;	// SD-card
 TIM_HandleTypeDef htim2;	// Buzzer
-char SPISD_Path[4];     /* USER logical drive path */
+
 
 //static void MX_SPI1_Init(void);
 //static void MX_TIM2_Init(void);
 static void ShortBeep();
 
-#elif defined(STM32F103xE)
-# include "bsp_driver_sd.h"
-
-SD_HandleTypeDef hsd;
-HAL_SD_CardInfoTypedef SDCardInfo;
-char SD_Path[4];        /* SD logical drive path */
-
-static void MX_SDIO_SD_Init(void);
-static inline void ShortBeep() {}
-#endif
-
-FATFS sdFileSystem;		// 0:/
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -78,8 +66,13 @@ FATFS sdFileSystem;		// 0:/
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_NVIC_Init(void);
+void MX_USB_HOST_Process(void);
+
 /* USER CODE BEGIN PFP */
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+FRESULT Explore_Disk(char *path, uint8_t recu_level);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -90,13 +83,9 @@ inline void moveVectorTable(uint32_t Offset)
     SCB->VTOR = FLASH_BASE | Offset;
 }
 
-//void debugPrintln(char _out[]){
-// HAL_UART_Transmit(&huart1, (uint8_t *) _out, strlen(_out), 10);
-// char newline[2] = "\r\n";
-// HAL_UART_Transmit(&huart1, (uint8_t *) newline, 2, 10);
-//}
+extern USBH_HandleTypeDef hUsbHostFS;
 
-/* PRINTF REDIRECT to UART END */
+
 /* USER CODE END 0 */
 
 /**
@@ -132,6 +121,7 @@ int main(void)
   MX_FATFS_Init();
   MX_SPI1_Init();
   MX_USART1_UART_Init();
+  MX_USB_HOST_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -142,8 +132,13 @@ int main(void)
 
   printf("Mounting Filesystem...\n\r");
   unsigned char result;
-  result = f_mount(&sdFileSystem, SPISD_Path, 1);
+  result = f_mount(&USBHFatFS, (TCHAR const*)USBHPath, 0);
 
+  //while(!USBH_MSC_IsReady(&hUsbHostFS))
+  //{
+	//MX_USB_HOST_Process();
+  //}
+  //Explore_Disk("0:/", 1);
   if (result == FR_OK)
   {
 	  printf("SUCCESS!\n\r");
@@ -183,10 +178,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    ShortBeep();
+    //ShortBeep();
     HAL_Delay(5000);
-    printf("SUCCESS!\n\r");
+    printf("beep\n\r");
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   }
@@ -201,6 +197,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the CPU, AHB and APB busses clocks 
   */
@@ -208,11 +205,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV5;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.Prediv1Source = RCC_PREDIV1_SOURCE_HSE;
+  RCC_OscInitStruct.Prediv1Source = RCC_PREDIV1_SOURCE_PLL2;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-  RCC_OscInitStruct.PLL2.PLL2State = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL2.PLL2State = RCC_PLL2_ON;
+  RCC_OscInitStruct.PLL2.PLL2MUL = RCC_PLL2_MUL8;
+  RCC_OscInitStruct.PLL2.HSEPrediv2Value = RCC_HSE_PREDIV2_DIV5;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -227,6 +226,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
@@ -247,6 +252,9 @@ static void MX_NVIC_Init(void)
   /* SPI1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(SPI1_IRQn);
+  /* OTG_FS_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
 }
 
 /* USER CODE BEGIN 4 */

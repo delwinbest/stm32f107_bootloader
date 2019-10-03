@@ -136,7 +136,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  printf("Booting\n\r");
+  printf("\n\rBooting\n\r");
   MX_FATFS_Init();
   ShortBeep();
 
@@ -146,9 +146,9 @@ int main(void)
 
   if (result == FR_OK)
   {
-	  printf("SUCCESS!");
+	  printf("SUCCESS!\n\r");
   } else {
-	  printf("FATFS FAILED CODE : %d\n", (int)result);
+	  printf("FATFS FAILED CODE : %d\n\r", (int)result);
   }
   /*
   if (FR_OK == f_mount(&sdFileSystem, SPISD_Path, 1) && FR_OK == flash("0:/firmware.bin"))
@@ -185,7 +185,7 @@ int main(void)
   {
     ShortBeep();
     HAL_Delay(5000);
-    printf(".");
+    printf("SUCCESS!\n\r");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

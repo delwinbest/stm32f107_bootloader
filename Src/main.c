@@ -64,7 +64,8 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN PFP */
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-FRESULT Explore_Disk(char *path, uint8_t recu_level);
+//FRESULT Explore_Disk(char *path, uint8_t recu_level);
+//static FIL MyFile;
 
 /* USER CODE END PFP */
 
@@ -76,7 +77,7 @@ inline void moveVectorTable(uint32_t Offset)
     SCB->VTOR = FLASH_BASE | Offset;
 }
 
-extern USBH_HandleTypeDef hUsbHostFS;
+//extern USBH_HandleTypeDef hUsbHostFS;
 
 
 /* USER CODE END 0 */
@@ -88,7 +89,7 @@ extern USBH_HandleTypeDef hUsbHostFS;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	  FRESULT res;
+  //FRESULT res;
   /* USER CODE END 1 */
   
 
@@ -115,27 +116,32 @@ int main(void)
   MX_USB_HOST_Init();
   MX_FATFS_Init();
 
+
+
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   printf("\n\rBooting\n\r");
-  MX_FATFS_Init();
-  ShortBeep();
+  //MX_USB_HOST_Process();
 
-  printf("Mounting Filesystem...\n\r");
+  ShortBeep();
+  /*
+  printf("\n\rMounting Filesystem...\n\r");
   res = f_mount(&USBHFatFS, (TCHAR const*)USBHPath, 0);
 
-  //while(!USBH_MSC_IsReady(&hUsbHostFS))
-  //{
-	//MX_USB_HOST_Process();
-  //}
-  //Explore_Disk("0:/", 1);
-  if (res == FR_OK)
+  if (res != FR_OK)
   {
-	  printf("SUCCESS!\n\r");
+	  printf("Failed to open %s, error %d\n\r", (TCHAR const*)USBHPath, res);
   } else {
-      printf("Failed to open %s, error %d\n\r", (TCHAR const*)USBHPath, res);
-  }
+	  printf("Mounted %s with exit code %d\n\r", (TCHAR const*)USBHPath, res);
+	  f_open(&MyFile, "0:/STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+	  if (res != FR_OK)
+	  {
+		  printf("Failed to open file with result : %d\n\r", res);
+	  } else {
+		  //f_write(&MyFile, wtext, sizeof(wtext), (void *)&byteswritten);
+	  }
+  }*/
   /*
   if (FR_OK == f_mount(&sdFileSystem, SPISD_Path, 1) && FR_OK == flash("0:/firmware.bin"))
   {
@@ -170,8 +176,8 @@ int main(void)
   while (1)
   {
     //ShortBeep();
-    HAL_Delay(5000);
-    printf("beep\n\r");
+    //HAL_Delay(5000);
+    //printf("beep\n\r");
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
@@ -240,9 +246,6 @@ static void MX_NVIC_Init(void)
   /* USART1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(USART1_IRQn);
-  /* OTG_FS_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
